@@ -1,27 +1,59 @@
-import * as core from '@actions/core'
-import { wait } from './wait.js'
+import * as core from '@actions/core';
+import { createServer } from './server.js';
+import { existsSync } from 'fs';
+import { resolve, isAbsolute } from 'path';
+import { spawn } from 'child_process';
 
-/**
- * The main function for the action.
- *
- * @returns Resolves when the action is complete.
- */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const port = parseInt(core.getInput('port'), 10) || 8080;
+    const testFile = core.getInput('testFile');
+    const runner = core.getInput('runner');
+    const packetList = core.getInput('packet-list');
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    // Throw an error if packet-list is not provided.
+    if (!packetList) {
+      throw new Error('No packet list provided.');
+    }
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const testFilePath = isAbsolute(testFile)
+      ? testFile
+      : resolve(process.cwd(), testFile);
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (!existsSync(testFilePath)) {
+      throw new Error(`Test file ${testFilePath} does not exist`);
+    }
+
+    const server = createServer(port);
+    core.info(`WebSocket server started on port ${port}`);
+
+    // Build the command arguments.
+    // If a runner command is provided, use it along with the testFile.
+    // Otherwise, execute the testFile directly.
+    const command = runner ? runner : testFilePath;
+    const args = runner ? [testFilePath] : [];
+
+    await new Promise<void>((resolveProcess, rejectProcess) => {
+      const child = spawn(command, args, { shell: true, stdio: 'inherit' });
+      child.on('error', rejectProcess);
+      child.on('exit', (code) => {
+        if (code !== 0) {
+          rejectProcess(new Error(`Test process exited with code ${code}`));
+        } else {
+          resolveProcess();
+        }
+      });
+    });
+
+    // After the test process completes, close the server.
+    server.close(() => {
+      core.info('WebSocket server closed.');
+    });
+  } catch (error: any) {
+    core.setFailed(error.message);
   }
+}
+
+if (require.main === module) {
+  run();
 }
