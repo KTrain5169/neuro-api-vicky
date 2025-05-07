@@ -1,6 +1,6 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Victor - Neuro-sama simulator in GitHub Actions
+description: A GitHub Action that allows you to use Neuro-sama simulators in GitHub Actions runs.
+author: KTrain5169
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
@@ -9,15 +9,38 @@ branding:
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  simulator:
+    description: "Which tool to use to simulate Neuro-sama. Currently supported: Randy, Jippity"
     required: true
-    default: '1000'
+  #version:
+    #description: "The version of the simulator to use. Does not work with Randy."
+    #required: true
+  deps-command:
+    description: "The command to install dependencies for your game."
+    required: false
+  run-command:
+    description: "The command to start your game."
+    required: true
+  actions-count:
+    description: "The number of actions to observe."
+    required: true
+
+  # The following still need to be accessed (it's not functional yet)
+  randy-packets:
+    description: "[Randy] The file to the JSON path for packets to send to Randy."
+    required: false
+  jippity-api-key:
+    description: "[Jippity] Your OpenAI API key (used to make Jippity function). This is not logged anywhere."
+    required: false
+  jippity-ai-model:
+    description: "[Jippity] The OpenAI model to use. Must support tools (formerly functions)."
+    required: false
+    default: "gpt-4o-mini"
 
 # Define your outputs here.
 outputs:
-  time:
-    description: Your output description here
+  observed_message_count:
+    description: "The observed amount of messages from the simulator."
 
 runs:
   using: node20

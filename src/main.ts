@@ -1,27 +1,26 @@
 import * as core from '@actions/core'
-import { wait } from './wait.js'
+import { runRandy } from './simulators/randy.js';
+import { runJippity } from './simulators/jippity.js';
 
-/**
- * The main function for the action.
- *
- * @returns Resolves when the action is complete.
- */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const simulator = core.getInput('simulator');
+    const version = core.getInput('version');
+    const runFile = core.getInput('run-file');
+    const actionsCount = parseInt(core.getInput('actions-count'), 10);
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
-
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    if (simulator === 'Randy') {
+      await runRandy(version, runFile, actionsCount);
+    } else if (simulator === 'Jippity') {
+      await runJippity(version, runFile, actionsCount);
+    } else {
+      core.setFailed(`Unsupported simulator: ${simulator}`);
+    }
   } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
   }
 }
+
+run();
