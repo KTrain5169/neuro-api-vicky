@@ -19,10 +19,11 @@ inputs:
     default: './tests/myTest.js'
   runner:
     description: >
-      Command to run the test file.
-      For example: "python" for Python tests or "node" for JavaScript.
-      Note that this doesn't install the corresponding language directly; you must set that up in a previous step (e.g. actions/setup-python or actions/setup-node).
-      If not supplied, the test file will be executed directly.
+      Command to run the test file. For example: "python" for Python tests or
+      "node" for JavaScript. Note that this doesn't install the corresponding
+      language directly; you must set that up in a previous step (e.g.
+      actions/setup-python or actions/setup-node). If not supplied, the test
+      file will be executed directly.
     required: false
     default: ''
   packet-list:
@@ -36,6 +37,8 @@ outputs:
     description: Whether or not all tests succeded or failed.
   time:
     description: The time it took. Useful for l*tency measurements.
+  log:
+    description: The run's log file.
 
 runs:
   using: node20

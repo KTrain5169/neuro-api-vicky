@@ -1,10 +1,10 @@
 import type * as core from '@actions/core'
 import { jest } from '@jest/globals'
 
-export const debug = jest.fn<typeof core.debug>()
-export const error = jest.fn<typeof core.error>()
-export const info = jest.fn<typeof core.info>()
-export const getInput = jest.fn<typeof core.getInput>()
-export const setOutput = jest.fn<typeof core.setOutput>()
-export const setFailed = jest.fn<typeof core.setFailed>()
-export const warning = jest.fn<typeof core.warning>()
+export const debug: typeof core.debug = jest.fn();
+export const error: typeof core.error = jest.fn();
+export const info: typeof core.info = jest.fn();
+export const getInput: typeof core.getInput = jest.fn<(name: string, options?: core.InputOptions) => string>();
+export const setOutput: typeof core.setOutput = jest.fn();
+export const setFailed: typeof core.setFailed = jest.fn();
+export const warning: typeof core.warning = jest.fn();
