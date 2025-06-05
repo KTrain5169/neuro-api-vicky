@@ -29,4 +29,4 @@ export default {
   testPathIgnorePatterns: ['/dist/', '/node_modules/'],
   clearMocks: true,
   verbose: true
-};
+}

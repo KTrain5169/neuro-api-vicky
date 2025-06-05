@@ -26,20 +26,21 @@
     "bundle": "pnpm run format:write && pnpm run package",
     "ci-test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 pnpx jest",
     "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
-    "format:write": "pnpx prettier --write .",
-    "format:check": "pnpx prettier --check .",
+    "format:write": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "pnpx eslint .",
     "local-action": "pnpx @github/local-action . src/main.ts .env",
-    "package": "pnpx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "package:watch": "npm run package -- --watch",
+    "package": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "package:watch": "pnpm run package -- --watch",
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 pnpx jest",
-    "all": "pnpm run format:write && pnpm run lint && pnpm run test && pnpm run coverage && pnpm run package",
-    "style": "prettier --write ."
+    "all": "pnpm run format:write && pnpm run lint && pnpm run test && pnpm run coverage && pnpm run package"
   },
   "license": "MIT",
   "dependencies": {
     "@actions/core": "~1.11.1",
     "@faker-js/faker": "~9.7.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "ajv": "~8.17.1",
     "ws": "~8.18.2"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ author: KTrain5169
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
   icon: heart
-  color: red
+  color: pink
 
 # Define your inputs here.
 inputs:
@@ -19,15 +19,16 @@ inputs:
     default: './tests/myTest.js'
   runner:
     description: >
-      Command to run the test file. For example: "python" for Python tests or
-      "node" for JavaScript. Note that this doesn't install the corresponding
-      language directly; you must set that up in a previous step (e.g.
-      actions/setup-python or actions/setup-node). If not supplied, the test
-      file will be executed directly.
+      Command to run the test file. For example: "python main.py" for Python
+      projects or "node" for JavaScript. Note that this doesn't install the
+      corresponding language directly; you must set that up in a previous step
+      (e.g. actions/setup-python or actions/setup-node). If not supplied, the
+      test file will be executed directly.
     required: false
     default: ''
   packet-list:
-    description: The list of packets to send, receive and expect.
+    description:
+      The JSON file containing the list of packets to send, receive and expect.
     required: false
     default: ''
 
