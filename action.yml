@@ -5,7 +5,7 @@ author: KTrain5169
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
   icon: heart
-  color: pink
+  color: purple
 
 # Define your inputs here.
 inputs:
@@ -39,7 +39,7 @@ outputs:
   time:
     description: The time it took. Useful for l*tency measurements.
   log:
-    description: The run's log file.
+    description: "The run's log file."
 
 runs:
   using: node20
