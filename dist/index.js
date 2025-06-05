@@ -2,7 +2,7 @@ import require$$0 from 'os';
 import require$$0$1 from 'crypto';
 import * as require$$1 from 'fs';
 import require$$1__default, { existsSync, mkdirSync, appendFileSync } from 'fs';
-import require$$1$5, { join } from 'path';
+import require$$1$5, { join, dirname } from 'path';
 import require$$2 from 'http';
 import require$$1$1 from 'https';
 import require$$0$5 from 'net';
@@ -27258,16 +27258,44 @@ class Logger {
         const date = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}`;
         const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
         const filename = `vicky_${date}_${time}_${runId}.log`;
-        const dir = process.cwd(); // or use a "logs/" subfolder if desired
-        if (!existsSync(dir))
+        // Place the log file directly under the current working directory:
+        const dir = process.cwd();
+        // Make sure the directory exists (in case it was deleted):
+        try {
+            if (!existsSync(dir)) {
+                mkdirSync(dir, { recursive: true });
+            }
+        }
+        catch (_a) {
             mkdirSync(dir, { recursive: true });
+        }
         this.logPath = join(dir, filename);
+        // And make sure the parent folder for logPath still exists:
+        const parentDir = dirname(this.logPath);
+        try {
+            if (!existsSync(parentDir)) {
+                mkdirSync(parentDir, { recursive: true });
+            }
+        }
+        catch (_b) {
+            mkdirSync(parentDir, { recursive: true });
+        }
     }
     stamp() {
         return new Date().toISOString();
     }
     log(level, message) {
         const line = `[${this.stamp()}] ${level}: ${message}\n`;
+        // Just before writing, re‑create the parent directory if it’s gone:
+        const parentDir = dirname(this.logPath);
+        try {
+            if (!existsSync(parentDir)) {
+                mkdirSync(parentDir, { recursive: true });
+            }
+        }
+        catch (_a) {
+            mkdirSync(parentDir, { recursive: true });
+        }
         appendFileSync(this.logPath, line, 'utf8');
         console[level.toLowerCase()](line.trim());
     }

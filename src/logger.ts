@@ -1,5 +1,5 @@
 import { appendFileSync, existsSync, mkdirSync } from 'fs'
-import { join } from 'path'
+import { join, dirname } from 'path'
 
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'CRITICAL'
 
@@ -12,9 +12,30 @@ export class Logger {
     const date = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}`
     const time = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`
     const filename = `vicky_${date}_${time}_${runId}.log`
-    const dir = process.cwd() // or use a "logs/" subfolder if desired
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+
+    // Place the log file directly under the current working directory:
+    const dir = process.cwd()
+
+    // Make sure the directory exists (in case it was deleted):
+    try {
+      if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true })
+      }
+    } catch {
+      mkdirSync(dir, { recursive: true })
+    }
+
     this.logPath = join(dir, filename)
+
+    // And make sure the parent folder for logPath still exists:
+    const parentDir = dirname(this.logPath)
+    try {
+      if (!existsSync(parentDir)) {
+        mkdirSync(parentDir, { recursive: true })
+      }
+    } catch {
+      mkdirSync(parentDir, { recursive: true })
+    }
   }
 
   private stamp(): string {
@@ -23,6 +44,17 @@ export class Logger {
 
   log(level: LogLevel, message: string) {
     const line = `[${this.stamp()}] ${level}: ${message}\n`
+
+    // Just before writing, re‑create the parent directory if it’s gone:
+    const parentDir = dirname(this.logPath)
+    try {
+      if (!existsSync(parentDir)) {
+        mkdirSync(parentDir, { recursive: true })
+      }
+    } catch {
+      mkdirSync(parentDir, { recursive: true })
+    }
+
     appendFileSync(this.logPath, line, 'utf8')
     console[level.toLowerCase() as 'log'](line.trim())
   }

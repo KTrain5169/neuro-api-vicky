@@ -28,5 +28,8 @@ export default {
   testMatch: ['**/*.test.ts'],
   testPathIgnorePatterns: ['/dist/', '/node_modules/'],
   clearMocks: true,
-  verbose: true
+  verbose: true,
+  moduleNameMapper: {
+    '^(.+)\\.js$': '$1'
+  }
 }
