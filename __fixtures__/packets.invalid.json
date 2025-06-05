@@ -1,0 +1,15 @@
+[
+  {
+    "command": "actions/register",
+    "game": "testGame",
+    "data": {
+      "actions": [
+        {
+          "name": "fly",
+          "description": "Character flies",
+          "schema": { "type": "object" }
+        }
+      ]
+    }
+  }
+]

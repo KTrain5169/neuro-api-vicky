@@ -1,23 +1,45 @@
-name: The name of your action here
-description: Provide a description here
-author: Your name or organization here
+name: Vicky (Neuro Game API)
+description: Neuro-sama simulator for testing integrations in CI.
+author: KTrain5169
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
   icon: heart
-  color: red
+  color: pink
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  port:
+    description: Port for the WebSocket server.
+    required: false
+    default: '8080'
+  testFile:
+    description: Path to the test file to run.
     required: true
-    default: '1000'
+    default: './tests/myTest.js'
+  runner:
+    description: >
+      Command to run the test file. For example: "python main.py" for Python
+      projects or "node" for JavaScript. Note that this doesn't install the
+      corresponding language directly; you must set that up in a previous step
+      (e.g. actions/setup-python or actions/setup-node). If not supplied, the
+      test file will be executed directly.
+    required: false
+    default: ''
+  packet-list:
+    description:
+      The JSON file containing the list of packets to send, receive and expect.
+    required: false
+    default: ''
 
 # Define your outputs here.
 outputs:
+  success:
+    description: Whether or not all tests succeded or failed.
   time:
-    description: Your output description here
+    description: The time it took. Useful for l*tency measurements.
+  log:
+    description: The run's log file.
 
 runs:
   using: node20

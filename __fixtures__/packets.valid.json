@@ -1,0 +1,42 @@
+[
+  {
+    "command": "startup",
+    "game": "testGame"
+  },
+  {
+    "command": "actions/register",
+    "game": "testGame",
+    "data": {
+      "actions": [
+        {
+          "name": "jump",
+          "description": "Character jumps",
+          "schema": { "type": "object" }
+        }
+      ]
+    }
+  },
+  {
+    "command": "actions/unregister",
+    "game": "testGame",
+    "data": { "action_names": ["jump"] }
+  },
+  {
+    "command": "context",
+    "game": "testGame",
+    "data": { "message": "Hello", "silent": false }
+  },
+  {
+    "command": "actions/force",
+    "game": "testGame",
+    "data": {
+      "query": "doSomething",
+      "ephemeral_context": false,
+      "actions": ["jump"]
+    }
+  },
+  {
+    "command": "shutdown/ready",
+    "game": "testGame"
+  }
+]

@@ -1,27 +1,59 @@
 import * as core from '@actions/core'
-import { wait } from './wait.js'
+import * as fs from 'fs'
+import { Logger } from './logger.js'
+import { startServer, stopServer, PacketList } from './server.js'
+import { runTest } from './runner.js'
 
-/**
- * The main function for the action.
- *
- * @returns Resolves when the action is complete.
- */
-export async function run(): Promise<void> {
+export async function run() {
   try {
-    const ms: string = core.getInput('milliseconds')
+    // 1) Read inputs
+    const portInput = core.getInput('port')
+    const port = parseInt(portInput, 10) || 8080
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const testFile = core.getInput('testFile')
+    const runner = core.getInput('runner')
+    const packetListPath = core.getInput('packet-list')
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const runId = process.env.GITHUB_RUN_ID || 'local'
+    const logger = new Logger(runId)
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    // 2) Load packet list JSON if provided
+    let packetList: PacketList | null = null
+    if (packetListPath && packetListPath.trim().length > 0) {
+      if (!fs.existsSync(packetListPath)) {
+        logger.error(`Packet list file not found: ${packetListPath}`)
+        core.setFailed(`Packet list file not found: ${packetListPath}`)
+        return
+      }
+      try {
+        const raw = fs.readFileSync(packetListPath, 'utf8')
+        packetList = JSON.parse(raw) as PacketList
+      } catch (e: any) {
+        logger.error(`Error parsing packet list JSON: ${e}`)
+        core.setFailed(`Error parsing packet list JSON: ${e}`)
+        return
+      }
+    }
+
+    // 3) Start WS server
+    const wss = startServer(port, logger, packetList)
+    core.setOutput('log', logger.path)
+
+    // 4) Run the test process
+    const { success, durationMs } = await runTest(runner, testFile, logger)
+
+    // 5) Stop WS server (give clients time to disconnect)
+    stopServer(wss, logger)
+
+    // 6) Set outputs
+    core.setOutput('success', success.toString())
+    core.setOutput('time', durationMs.toString())
+    // 'log' was set earlier
+
+    if (!success) {
+      core.setFailed('Test run failed; see log for details.')
+    }
+  } catch (err: any) {
+    core.setFailed(err.message)
   }
 }
