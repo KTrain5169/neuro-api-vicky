@@ -26,14 +26,15 @@ describe('startServer/stopServer', () => {
     ;(process.exit as unknown as jest.Mock).mockRestore()
     // Clean up: stop server (if still running), then delete temp dir
     if (wss) {
-    try {
-      stopServer(wss, logger)
-    } catch {}}
+      try {
+        stopServer(wss, logger)
+      } catch {}
+    }
     process.chdir(__dirname)
     fs.rmSync(tmpDir, { recursive: true, force: true })
   })
   beforeEach(() => {
-    wss = undefined!;
+    wss = undefined!
     // Create a temp folder for logger output, then cd into it
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vicky-server-test-'))
     process.chdir(tmpDir)
@@ -134,15 +135,15 @@ describe('startServer/stopServer', () => {
     process.chdir(subTmp)
     const invLogger = new Logger(`${runId}-invalid`)
     const serverInvalid = startServer(0, invLogger, packetList)
-    wss = serverInvalid;
+    wss = serverInvalid
 
     serverInvalid.on('listening', () => {
       const addressInfo = serverInvalid.address() as { port: number }
       const portInvalid = addressInfo.port
 
       const failTimeout = setTimeout(() => {
-        done(new Error('Timeout waiting for WebSocket to close'));
-      }, 4500);
+        done(new Error('Timeout waiting for WebSocket to close'))
+      }, 4500)
 
       const client = new WebSocket(`ws://localhost:${portInvalid}`)
       client.on('open', () => {

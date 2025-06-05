@@ -39493,6 +39493,12 @@ async function run() {
         const packetListPath = coreExports.getInput('packet-list');
         const runId = process.env.GITHUB_RUN_ID || 'local';
         const logger = new Logger(runId);
+        console.log('🏁 Inputs:', {
+            port,
+            testFile,
+            runner,
+            packetListPath
+        });
         // 2) Load packet list JSON if provided
         let packetList = null;
         if (packetListPath && packetListPath.trim().length > 0) {

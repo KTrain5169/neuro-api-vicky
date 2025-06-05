@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -53,6 +53,8 @@ jobs:
         with:
           version: 4.x
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: licensed cache
 
       # If this is a workflow_dispatch event, update the cached licenses.
       - if: ${{ github.event_name == 'workflow_dispatch' }}
