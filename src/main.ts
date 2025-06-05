@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import * as fs from 'fs'
-import { Logger } from './logger.js'
+import { Logger, Store } from './logger.js'
 import { startServer, stopServer, PacketList } from './server.js'
 import { runTest } from './runner.js'
 
@@ -16,6 +16,7 @@ export async function run() {
 
     const runId = process.env.GITHUB_RUN_ID || 'local'
     const logger = new Logger(runId)
+    const store = new Store(runId)
 
     console.log('🏁 Inputs:', {
       port,
@@ -45,6 +46,8 @@ export async function run() {
     // 3) Start WS server
     const wss = startServer(port, logger, packetList)
     core.setOutput('log', logger.path)
+    core.setOutput('context-store', store.contextPath)
+    core.setOutput('actions-store', store.actionsPath)
 
     // 4) Run the test process
     const { success, durationMs } = await runTest(runner, testFile, logger)
@@ -55,7 +58,6 @@ export async function run() {
     // 6) Set outputs
     core.setOutput('success', success.toString())
     core.setOutput('time', durationMs.toString())
-    // 'log' was set earlier
 
     if (!success) {
       core.setFailed('Test run failed; see log for details.')
